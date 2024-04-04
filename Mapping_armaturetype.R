@@ -1,5 +1,5 @@
 ##codigo para plotar variaveis em shapefile#
-##feito por Eduardo Arle em Github##
+##feito por Eduardo Arlé em Github##
 rm(list=ls())
 # Install and load the sf package if you haven't already done so
 
@@ -11,15 +11,30 @@ wd_shp <- '/Users/rachelsouzaferreira/Dropbox/PhD/Chapter 1/Data/SpatialData'
 wd_data <- "/Users/rachelsouzaferreira/Desktop"
 wd_map_stuff <- '/Users/rachelsouzaferreira/Desktop'
 
+#list wds (Edu's computer)
+wd_shp <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo/SpatialData'
+wd_data <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo'
+wd_map_stuff <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo'
+
 ### get meanBA in grid cells 
 
-table <- read.csv("/Users/rachelsouzaferreira/Dropbox/PhD/Chapter 1/SEMS_chapter1/Data/mapping_variables_2_april.csv")
+# %% I changed it here. Set the WD where your data is also, please!
+
+setwd(wd_data)  
+table <- read.csv("mapping_variables_2_april.csv")
 
 
 # Read the shapefile
-shp_grid <- st_read("BehrmannMeterGrid_WGS84_land", dsn ="/Users/rachelsouzaferreira/Desktop/SpatialData")
+
+# %% I changed it here. Refer to the DSN where your data is also, please!
+
+shp_grid <- st_read("BehrmannMeterGrid_WGS84_land", dsn = wd_shp)
+
+
 st_geometry_type(shp_grid)
-st_write(shp_grid, "/Users/rachelsouzaferreira/Dropbox/PhD/Chapter 1/Data/SpatialData/BehrmannMeterGrid_WGS84_land.shp", driver = "ESRI Shapefile",append=FALSE)
+
+# %% It looks like you are overwriting the original one here? why?
+# st_write(shp_grid, "/Users/rachelsouzaferreira/Dropbox/PhD/Chapter 1/Data/SpatialData/BehrmannMeterGrid_WGS84_land.shp", driver = "ESRI Shapefile",append=FALSE)
 
 # Check the structure of the shapefile and plot
 str(shp_grid)
@@ -65,10 +80,6 @@ for(i in 1:nrow(shp_grid))
 
 world <- readRDS("wrld.rds")
 worldmapframe <- readRDS("Worldmapframe.rds")
-
-# # reproject everythign to Eckert
-# worldmapframe <- spTransform(worldmapframe,CRS(proj4string(world)))
-# shp2 <- spTransform(shp_grid,CRS(proj4string(world)))
 
 #### transform SpatialPolygons into sf object
 worldmapframe <- st_as_sf(worldmapframe)
@@ -127,11 +138,63 @@ colramp <- colorRampPalette(c("#3288bd", "#66c2a5", "#abdda4",
                                        "#abdda4", "#e6f598", "#ffffbf",
                                        "#fee08b", "#fdae61", "#f46d43",
                                        "#d53e4f", "#9e0142"))                                       
-                                       
-#populate the table with the colours to be plotted 
-shp2$colours_fire <- colramp(100)[cut(c(0,9,shp_grid$meanBA), 
-                                      breaks = 100)][-c(1,2)]
 
+#log transform value and make the minimum equal 0 for plotting only
+trans_values <-  log(shp_grid$meanBA) + 
+            abs(min(log(shp_grid$meanBA), na.rm = T))
+
+
+##### tests #####
+
+a <- which(!is.na(shp_grid$meanBA))
+b <- which.max(shp_grid$meanBA)
+
+
+t <- shp_grid$meanBA[a[1]]
+v <- shp_grid$meanBA[a[991]]
+max <- shp_grid$meanBA[b]
+c <- 0.1875
+d <- 0.375
+e <- 0.5625
+
+t2 <- log(t) + abs(min(log(shp_grid$meanBA), na.rm = T))
+v2 <- log(v) + abs(min(log(shp_grid$meanBA), na.rm = T))
+max2 <- log(max) + abs(min(log(shp_grid$meanBA), na.rm = T))
+c2 <- log(c) + abs(min(log(shp_grid$meanBA), na.rm = T))
+d2 <- log(d) + abs(min(log(shp_grid$meanBA), na.rm = T))
+e2 <- log(e) + abs(min(log(shp_grid$meanBA), na.rm = T))
+
+
+t3 <- exp(t2 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+v3 <- exp(v2 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+max3 <- exp(max2 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+c3 <- exp(c2 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+d3 <- exp(d2 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+e3 <- exp(e2 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+
+max_1_4 <- exp(max2/4 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+max_1_2 <- exp(max2/2 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+max_3_4 <- exp(max2/4*3 - abs(min(log(shp_grid$meanBA), na.rm = T)))
+
+max4 <- exp(log(max(shp_grid$meanBA, na.rm = T)) + 
+              abs(min(log(shp_grid$meanBA), na.rm = T)) -
+              abs(min(log(shp_grid$meanBA), na.rm = T)))
+
+hist(shp_grid$meanBA)
+boxplot(shp_grid$meanBA)
+summary(shp_grid$meanBA)
+
+round(exp((log(max(shp_grid$meanBA, na.rm = T)) + 
+  abs(min(log(shp_grid$meanBA), na.rm = T)) *3 / 4) -
+  abs(min(log(shp_grid$meanBA), na.rm = T))),3)
+  
+  
+#################
+
+#populate the table with the colours to be plotted 
+shp2$colours_fire <- colramp(100)[cut(trans_values, breaks = 100)]
+
+#set NAs to be plot in grey
 shp2$colours_fire[which(is.na(shp2$colours_fire))] <- 'gray80'
   
 ### PLOT
@@ -139,16 +202,53 @@ par(mar=c(2,2,2,2), bg = 'white')
 plot(st_geometry(shp2), border = NA , col = shp2$colours_fire)
 plot(worldmapframe , add = T)
 
+#get max and min values to plot the legend
+min_fire <- min(shp_grid$meanBA, na.rm = T)
+max_fire <- max(shp_grid$meanBA, na.rm = T)
+
+delta_fire <- max_fire - min_fire
+
+#get log transformed values to plot the legend
+trans_min_fire <- min(trans_values, na.rm = T)
+trans_max_fire <- max(trans_values, na.rm = T)
+
+trans_min_diff <- abs(min(log(shp_grid$meanBA), na.rm = T))
+
+#list values for the plot
+values <-  c(min_fire,
+  exp(trans_max_fire * 1/4 - trans_min_diff),
+  exp(trans_max_fire * 2/4 - trans_min_diff),
+  exp(trans_max_fire * 3/4 - trans_min_diff),
+  max_fire)
+
+#set scientific notation (to deal with tiny numbers)
+values_2 <- formatC(values, format = "fg") 
+
 #plot icons legend (first load function)
-myGradientLegend(valRange = c(min(shp_grid$meanBA, na.rm = T), 
-                              max(shp_grid$meanBA, na.rm = T)),
-                 pos=c(0.27,0.1,0.68,0.12),
-                 color = colramp(100),
+myGradientLegend(valRange = c(min_fire, max_fire), 
+                 pos = c(0.27,0.1,0.68,0.12),
+                 color = colramp(100), 
                  side = 1,
-                 n.seg = 0,
-                 values = c(round(min(shp_grid$meanBA, na.rm = T)), 
-                            round(max(shp_grid$meanBA, na.rm = T))),
+                 n.seg = c(min_fire,
+                           delta_fire / 4,
+                           delta_fire / 2,
+                           delta_fire * 3/4,
+                           max_fire),
+                 values = values_2,
                  cex = 2)
+
+
+burden <- 6638
+
+t <- c("0",
+  paste(round(exp(log(max(burden))/4))),
+  paste(round(exp(log(max(burden))/2))),
+  paste(round(exp(log(max(burden))*3/4))),
+  paste(max(burden)))
+
+
+log(shp_grid$meanBA) + abs(min(log(shp_grid$meanBA), na.rm = T))
+
 
 myGradientLegend(valRange = c(min(shp_grid$meanBA, na.rm = T), 
                               max(shp_grid$meanBA, na.rm = T)),
@@ -157,7 +257,7 @@ myGradientLegend(valRange = c(min(shp_grid$meanBA, na.rm = T),
                  side = 1,
                  n.seg = 0,
                  values = c(NA,'NA'),
-                 cex = 2)
+                 cex = 1.5)
 
 
 #plot phylacine animal presence
