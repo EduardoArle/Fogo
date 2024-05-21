@@ -10,21 +10,33 @@ library(sf);library(raster)
 wd_shp <- '/Users/rachelsouzaferreira/Dropbox/PhD/Chapter 1/Data/SpatialData'
 wd_data <- "/Users/rachelsouzaferreira/Desktop"
 wd_map_stuff <- '/Users/rachelsouzaferreira/Desktop'
-_
+
+#list wds (Edu's computer)
+wd_shp <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo/SpatialData'
+wd_data <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo'
+wd_map_stuff <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo'
+
 ### get meanBA in grid cells 
 
-table <- read.csv("/Users/rachelsouzaferreira/Data/Chapter 1/Outputs/mapping_variables_2_april.csv")
+###################################################################################
+### this is very bad practice and makes impossioble to collaborate on GitHub, the WDs 
+#must be listed in the top on the code and refered by their name
+###################################################################################
+
+
+setwd(wd_data)
+table <- read.csv("Mapping_variables_2_april.csv")
 
 
 # Read the shapefile
-shp_grid <- st_read("BehrmannMeterGrid_WGS84_land", dsn ="/Users/rachelsouzaferreira/Desktop/SpatialData")
-st_geometry_type(shp_grid)
-st_write(shp_grid, "/Users/rachelsouzaferreira/Dropbox/PhD/Chapter 1/Data/SpatialData/BehrmannMeterGrid_WGS84_land.shp", driver = "ESRI Shapefile",append=FALSE)
-
-
 shp_grid <- st_read("BehrmannMeterGrid_WGS84_land", dsn = wd_shp)
 
+st_geometry_type(shp_grid)
 
+# ?? why are you saving and reading the shapefile again without making any changes?
+
+st_write(shp_grid, dsn = wd_shp, driver = "ESRI Shapefile",append=FALSE)
+shp_grid <- st_read("BehrmannMeterGrid_WGS84_land", dsn = wd_shp)
 st_geometry_type(shp_grid)
 
 # %% It looks like you are overwriting the original one here? why?
@@ -79,12 +91,12 @@ worldmapframe <- st_as_sf(worldmapframe)
 
 # Transform the sf object and frame
 shp2 <- st_transform(shp_grid, crs = st_crs(world))
-worldmapframe <- st_transform(worldmapframe,crs = st_crs(world))
+worldmapframe <- st_transform(worldmapframe, crs = st_crs(world))
 
 ###plot
 
 plot(st_geometry(shp2))
-plot(st_geometry(worldmapframe),add= T)
+plot(st_geometry(worldmapframe), add= T)
 # #create colour ramp to represent the values
 # colramp <- colorRampPalette(c("#9e0142", "#d53e4f", "#f46d43",
 #                               "#fdae61", "#fee08b", "#ffffbf",
@@ -134,7 +146,7 @@ colramp <- colorRampPalette(c("#3288bd", "#66c2a5", "#abdda4",
                               "#d53e4f", "#9e0142"))                                       
 
 # Setup plot layout
-par(mfrow=c(2, 3)
+par(mfrow=c(2, 3))
 
 #log transform value and make the minimum equal 0 for plotting only
 trans_values <-  log(shp_grid$meanBA) + 
