@@ -4,11 +4,21 @@ library(sf);library(raster);library(dplyr)
 
 #Load the trait data
 
-armature <- read.csv("/Users/rachelsouzaferreira/Data/Chapter 1/Outputs/WorldID_Mimosoid.csv", sep= ",")
-#list wds
+#list wds Eduardo
+wd_output <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo'
+wd_shp <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo/SpatialData'
+wd_map_stuff <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo'
+wd_data <- '/Users/carloseduardoaribeiro/Documents/Collaborations/Rachel/Fogo'
+
+#list wds Rachel
+wd_output <- '"/Users/rachelsouzaferreira/Data/Chapter 1/Outputs'
 wd_shp <- '/Users/rachelsouzaferreira/Desktop/SpatialData'
 wd_data <- "/Users/rachelsouzaferreira/Data/Chapter 1/Outputs"
 wd_map_stuff <- '/Users/rachelsouzaferreira/Dropbox/Data/mapa'
+
+#load table
+setwd(wd_output)
+armature <- read.csv("WorldID_Mimosoid.csv", sep= ",")
 
 armature$armature_description <- factor(armature$Armature_type,
                                         levels = c(0, 1, 2, 3, 4, 5, 13, 14, 34),
@@ -94,7 +104,7 @@ shp_grid$Armature_Stipular_spines  <- NA
 shp_grid$Armature_Axillary_spines  <- NA
 shp_grid$Armature_Thorn_Prickle   <- NA
 shp_grid$Armature_Thorn_StipularSpine  <- NA
-shp_grid$ Armature_Prickle_StipularSpine  <- NA
+shp_grid$Armature_Prickle_StipularSpine  <- NA
 
 
 for(i in 1:nrow(shp_grid))
@@ -231,25 +241,31 @@ shp2$colours_Armature_Axillary_spines[which(is.na(shp2$colours_Armature_Axillary
 par(mar=c(1,1,1,1), bg = 'white',mfrow = c(2,3))
 
 ##definir parametro de cada plot
-#cexo.main = 3
-#poso = c(0.27, 0.1, 0.68, 0.12) 
+cexo.main <- 3.5
 
-#poso.vert1 = c(0, -0.2, 0, -0.2)
-#poso.vert2 = c(0, -0.05, 0, -0.05)
+poso1 <- c(0.15,0.19,0.63,0.21)
+poso2 <- c(0.17,0.19,0.65,0.21)
+poso3 <- c(0.19,0.19,0.67,0.21)
+poso4 <- c(0.21,0.21,0.69,0.23)
+poso5 <- c(0.21,0.23,0.69,0.25)
+  
+pose1 <- c(0.80,0.23,0.825,0.25)
+pose2 <- c(0.79,0.23,0.815,0.25)
 
-#poso.hori1 = c(-0.05, 0, -0.05, 0)
-#poso.hori2 = c(-0.01, 0, -0.01, 0)
+
+col_border1 <- '#000000'
+col_border2 <- '#303030'
 
 plot(st_geometry(shp2), border = NA , col = shp2$colours_thorn)
-title("Thorn", line = -7, cex.main = 3.5, font.main = 2)
-plot(worldmapframe , add = T)
+title("Thorn", line = -10, cex.main = 3.5, font.main = 2)
+plot(worldmapframe , add = T, border = col_border2)
 
 #plot(worldmapframe , add = T)
 
 #plot icons legend (first load function)
 myGradientLegend(valRange = c(min(shp_grid$Armature_Thorns, na.rm = T), 
                               max(shp_grid$Armature_Thorns, na.rm = T)),
-                 pos=c(0.15,0.19,0.63,0.21),
+                 pos = poso5,
                  color = colramp(100),
                  side = 1,
                  n.seg = 0,
@@ -260,7 +276,7 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Thorns, na.rm = T),
 
 myGradientLegend(valRange = c(min(shp_grid$Armature_Thorns, na.rm = T), 
                               max(shp_grid$Armature_Thorns, na.rm = T)),
-                 pos=c(0.75,0.19,0.775,0.21),
+                 pos = pose1,
                  color = 'gray80',
                  side = 1,
                  n.seg = 0,
@@ -270,13 +286,13 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Thorns, na.rm = T),
 #Spinescent_shoot
 plot(st_geometry(shp2), border = NA , col = shp2$colours_Armature_Spinescent_shoots)
 #plot(worldmapframe , add = T)
-title("Spinescent Shoot", line = -7, cex.main = cexo.main, font.main = 2)
-plot(worldmapframe , add = T)
+title("Spinescent Shoot", line = -8.5, cex.main = cexo.main, font.main = 2)
+plot(worldmapframe , add = T, border = col_border1)
 
 #plot icons legend (first load function)
 myGradientLegend(valRange = c(min(shp_grid$Armature_Spinescent_shoots, na.rm = T), 
                               max(shp_grid$Armature_Spinescent_shoots, na.rm = T)),
-                 pos=c(0.15,0.19,0.63,0.21),
+                 pos = poso2,
                  color = colramp(100),
                  side = 1,
                  n.seg = 0,
@@ -286,7 +302,7 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Spinescent_shoots, na.rm = T
 
 myGradientLegend(valRange = c(min(shp_grid$Armature_Spinescent_shoots, na.rm = T), 
                               max(shp_grid$Armature_Spinescent_shoots, na.rm = T)),
-                 pos=c(0.75,0.19,0.775,0.21),
+                 pos = pose2,
                  color = 'gray80',
                  side = 1,
                  n.seg = 0,
@@ -295,12 +311,12 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Spinescent_shoots, na.rm = T
 ### PLOT
 plot(st_geometry(shp2), border = NA , col = shp2$colours_Armature_Prickles)
 #plot(worldmapframe , add = T)
-title("Prickle", line = -7, cex.main = cexo.main, font.main = 2)
-plot(worldmapframe , add = T)
+title("Prickle", line = -9, cex.main = cexo.main, font.main = 2)
+plot(worldmapframe , add = T, border = col_border1)
 #plot icons legend
 myGradientLegend(valRange = c(min(shp_grid$Armature_Prickles, na.rm = T), 
                               max(shp_grid$Armature_Prickles, na.rm = T)),
-                 pos=c(0.15,0.19,0.63,0.21),
+                 pos = poso3,
                  color = colramp(100),
                  side = 1,
                  n.seg = 0,
@@ -310,7 +326,7 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Prickles, na.rm = T),
 
 myGradientLegend(valRange = c(min(shp_grid$Armature_Prickles, na.rm = T), 
                               max(shp_grid$Armature_Prickles, na.rm = T)),
-                 pos=c(0.75,0.19,0.775,0.21),
+                 pos = pose3,
                  color = 'gray80',
                  side = 1,
                  n.seg = 0,
@@ -320,12 +336,12 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Prickles, na.rm = T),
 ### PLOT
 plot(st_geometry(shp2), border = NA , col = shp2$colours_Armature_Stipular_spines)
 #plot(worldmapframe , add = T)
-title("Stipular spines", line = -7, cex.main = cexo.main, font.main = 2)
-plot(worldmapframe , add = T)
+title("Stipular spines", line = -9.5, cex.main = cexo.main, font.main = 2)
+plot(worldmapframe , add = T, border = col_border2)
 #plot icons legend
 myGradientLegend(valRange = c(min(shp_grid$Armature_Stipular_spines, na.rm = T), 
                               max(shp_grid$Armature_Stipular_spines, na.rm = T)),
-                 pos=c(0.15,0.19,0.63,0.21),
+                 pos = poso4,
                  color = colramp(100),
                  side = 1,
                  n.seg = 0,
@@ -335,7 +351,7 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Stipular_spines, na.rm = T),
 
 myGradientLegend(valRange = c(min(shp_grid$Armature_Stipular_spines, na.rm = T), 
                               max(shp_grid$Armature_Stipular_spines, na.rm = T)),
-                 pos=c(0.75,0.19,0.775,0.21),
+                 pos = pose4,
                  color = 'gray80',
                  side = 1,
                  n.seg = 0,
@@ -345,12 +361,12 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Stipular_spines, na.rm = T),
 ### PLOT
 plot(st_geometry(shp2), border = NA , col = shp2$colours_Armature_Axillary_spines)
 #plot(worldmapframe , add = T)
-title("Axillary spines", line = -7, cex.main = cexo.main, font.main = 2)
-plot(worldmapframe , add = T)
+title("Axillary spines", line = -10, cex.main = cexo.main, font.main = 2)
+plot(worldmapframe , add = T, border = col_border2)
 #plot icons legend
 myGradientLegend(valRange = c(min(shp_grid$Armature_Axillary_spines, na.rm = T), 
                               max(shp_grid$Armature_Axillary_spines, na.rm = T)),
-                 pos=c(0.15,0.19,0.63,0.21),
+                 pos = poso5,
                  color = colramp(100),
                  side = 1,
                  n.seg = 0,
@@ -360,7 +376,7 @@ myGradientLegend(valRange = c(min(shp_grid$Armature_Axillary_spines, na.rm = T),
 
 myGradientLegend(valRange = c(min(shp_grid$Armature_Axillary_spines, na.rm = T), 
                               max(shp_grid$Armature_Axillary_spines, na.rm = T)),
-                 pos=c(0.75,0.19,0.775,0.21),
+                 pos = pose5,
                  color = 'gray80',
                  side = 1,
                  n.seg = 0,

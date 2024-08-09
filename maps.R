@@ -1,5 +1,5 @@
 ##codigo para plotar variaveis em shapefile#
-##feito por Eduardo Arle em Github##
+##feito por Eduardo Arlé em Github##
 rm(list=ls())
 # Install and load the sf package if you haven't already done so
 
